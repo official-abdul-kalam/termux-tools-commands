@@ -59,7 +59,7 @@ const tools = [
         title: "WiFi Scanner",
         description: "Scan and analyze nearby WiFi networks",
         tags: ["WIFI", "NETWORK"],
-        preview: "https://picsum.photos/300/150",
+        preview: getRandomPreviewImage(),
         author: "Admin",
         date: "2024-03-20",
         code: `pkg install python
@@ -74,14 +74,13 @@ python scanner.py`,
         title: "Social Media Toolkit",
         description: "Collection of social media analysis tools",
         tags: ["SOCIAL", "ANALYSIS"],
-        preview: "https://picsum.photos/300/150",
+        preview: getRandomPreviewImage(),
         author: "Admin",
         date: "2024-03-19",
         code: `pkg install git
 git clone https://github.com/example/social-toolkit
 cd social-toolkit
 bash setup.sh`,
-
         views: 850,
         likes: 32
     }
@@ -643,7 +642,8 @@ function getRandomProfileImage() {
         'assets/images/profile/profile7.jpg',
         'assets/images/profile/profile8.jpg',
         'assets/images/profile/profile9.jpg',
-        'assets/images/profile/profile10.jpg'
+        'assets/images/profile/profile10.jpg',
+        'assets/images/profile/profile11.jpg'
     ];
     return profileImages[Math.floor(Math.random() * profileImages.length)];
 }
@@ -661,22 +661,24 @@ function getRandomPreviewImage() {
 }
 
 // Update user profile when displaying
-const userProfile = document.querySelector('.sidebar-user-profile img');
-if (userProfile) {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    if (currentUser) {
-        currentUser.profileImage = currentUser.profileImage || getRandomProfileImage();
-        userProfile.src = currentUser.profileImage;
+document.addEventListener('DOMContentLoaded', function() {
+    const userProfile = document.querySelector('.sidebar-user-profile img');
+    if (userProfile) {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (currentUser) {
+            currentUser.profileImage = currentUser.profileImage || getRandomProfileImage();
+            userProfile.src = currentUser.profileImage;
+        }
     }
-}
-
-// Update tool previews
-const toolCards = document.querySelectorAll('.tool-card img');
-toolCards.forEach(card => {
-    const toolId = card.closest('.tool-card').dataset.id;
-    const tool = tools.find(t => t.id === toolId);
-    if (tool) {
-        tool.preview = tool.preview || getRandomPreviewImage();
-        card.src = tool.preview;
-    }
+    
+    // Update tool previews
+    const toolCards = document.querySelectorAll('.tool-card img');
+    toolCards.forEach(card => {
+        const toolId = card.closest('.tool-card').dataset.id;
+        const tool = tools.find(t => t.id === toolId);
+        if (tool) {
+            tool.preview = tool.preview || getRandomPreviewImage();
+            card.src = tool.preview;
+        }
+    });
 }); 
