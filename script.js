@@ -101,15 +101,12 @@ const loginForm = document.getElementById('loginForm');
 const signupForm = document.getElementById('signupForm');
 const showSignupLink = document.getElementById('showSignup');
 const showLoginLink = document.getElementById('showLogin');
-const userProfile = document.getElementById('userProfile');
-const logoutBtn = document.getElementById('logoutBtn');
 
 // Profile picture elements
 const profilePicInput = document.getElementById('profilePicInput');
 const signupProfilePicInput = document.getElementById('signupProfilePicInput');
 const profilePic = document.getElementById('profilePic');
 const signupProfilePic = document.getElementById('signupProfilePic');
-const userProfilePic = document.getElementById('userProfilePic');
 
 // Add new DOM elements
 const sidebarUserProfile = document.getElementById('sidebarUserProfile');
@@ -120,40 +117,42 @@ const logoutBtnSidebar = document.getElementById('logoutBtnSidebar');
 const loginPromptModal = document.getElementById('loginPromptModal');
 const goToLoginBtn = document.getElementById('goToLoginBtn');
 const skipLoginBtn = document.getElementById('skipLoginBtn');
+const editProfileBtn = document.getElementById('editProfileBtn');
+const editProfileModal = document.getElementById('editProfileModal');
+const editProfileForm = document.getElementById('editProfileForm');
+const editProfilePic = document.getElementById('editProfilePic');
+const editProfilePicInput = document.getElementById('editProfilePicInput');
+const sidebarProfilePicInput = document.getElementById('sidebarProfilePicInput');
 
 // Auth state observer
 auth.onAuthStateChanged(async (user) => {
     if (user) {
         // User is signed in
         loginModal.style.display = 'none';
-        userProfile.style.display = 'block';
-        sidebarUserProfile.style.display = 'flex';
         loginBtn.style.display = 'none';
         logoutBtnSidebar.style.display = 'block';
+        sidebarUserProfile.style.display = 'flex';
         
-        // Update profile info
+        // Update sidebar profile info
         const displayName = user.displayName || 'User';
-        document.getElementById('userName').textContent = displayName;
-        document.getElementById('userEmail').textContent = user.email;
         sidebarUserName.textContent = displayName;
         sidebarUserEmail.textContent = user.email;
         
         // Get user profile picture
         const userDoc = await getDoc(doc(db, 'users', user.uid));
         if (userDoc.exists() && userDoc.data().photoURL) {
-            userProfilePic.src = userDoc.data().photoURL;
             sidebarUserPic.src = userDoc.data().photoURL;
+            editProfilePic.src = userDoc.data().photoURL;
         } else {
             const defaultPic = 'https://via.placeholder.com/100';
-            userProfilePic.src = user.photoURL || defaultPic;
             sidebarUserPic.src = user.photoURL || defaultPic;
+            editProfilePic.src = user.photoURL || defaultPic;
         }
     } else {
         // User is signed out
-        userProfile.style.display = 'none';
-        sidebarUserProfile.style.display = 'none';
         loginBtn.style.display = 'block';
         logoutBtnSidebar.style.display = 'none';
+        sidebarUserProfile.style.display = 'none';
     }
 });
 
@@ -246,16 +245,14 @@ signupForm.addEventListener('submit', async (e) => {
     }
 });
 
-// Handle Logout (both buttons)
-[logoutBtn, logoutBtnSidebar].forEach(btn => {
-    btn.addEventListener('click', async () => {
-        try {
-            await auth.signOut();
-            showNotification('Successfully logged out!');
-        } catch (error) {
-            showNotification(error.message, 'error');
-        }
-    });
+// Handle Logout (sidebar button only)
+logoutBtnSidebar.addEventListener('click', async () => {
+    try {
+        await auth.signOut();
+        showNotification('Successfully logged out!');
+    } catch (error) {
+        showNotification(error.message, 'error');
+    }
 });
 
 // Toggle between login and signup forms
@@ -523,5 +520,113 @@ window.addEventListener('click', (e) => {
     }
     if (e.target === privacyModal) {
         privacyModal.style.display = 'none';
+    }
+});
+
+// Handle Edit Profile Button Click
+editProfileBtn.addEventListener('click', () => {
+    const user = auth.currentUser;
+    if (user) {
+        document.getElementById('editUsername').value = user.displayName || '';
+        editProfileModal.style.display = 'block';
+    }
+});
+
+// Handle Edit Profile Form Submit
+editProfileForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const newUsername = document.getElementById('editUsername').value;
+    const submitBtn = editProfileForm.querySelector('button[type="submit"]');
+
+    try {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('loading');
+
+        // Upload new profile picture if selected
+        let photoURL = null;
+        if (editProfilePicInput.files[0]) {
+            const storageRef = ref(storage, `profile_pics/${user.uid}`);
+            await uploadBytes(storageRef, editProfilePicInput.files[0]);
+            photoURL = await getDownloadURL(storageRef);
+        }
+
+        // Update profile
+        await updateProfile(user, {
+            displayName: newUsername,
+            photoURL: photoURL || user.photoURL
+        });
+
+        // Update Firestore
+        await setDoc(doc(db, 'users', user.uid), {
+            username: newUsername,
+            email: user.email,
+            photoURL: photoURL || user.photoURL,
+            updatedAt: new Date().toISOString()
+        }, { merge: true });
+
+        showNotification('Profile updated successfully!');
+        editProfileModal.style.display = 'none';
+    } catch (error) {
+        showNotification(error.message, 'error');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('loading');
+    }
+});
+
+// Handle profile picture uploads
+editProfilePicInput.addEventListener('change', (e) => {
+    handleProfilePicUpload(e.target.files[0], editProfilePic);
+});
+
+sidebarProfilePicInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        try {
+            // Show loading state
+            sidebarUserPic.style.opacity = '0.5';
+
+            // Upload new profile picture
+            const storageRef = ref(storage, `profile_pics/${user.uid}`);
+            await uploadBytes(storageRef, file);
+            const photoURL = await getDownloadURL(storageRef);
+
+            // Update profile
+            await updateProfile(user, {
+                photoURL: photoURL
+            });
+
+            // Update Firestore
+            await setDoc(doc(db, 'users', user.uid), {
+                photoURL: photoURL,
+                updatedAt: new Date().toISOString()
+            }, { merge: true });
+
+            // Update UI
+            sidebarUserPic.src = photoURL;
+            editProfilePic.src = photoURL;
+            showNotification('Profile picture updated successfully!');
+        } catch (error) {
+            showNotification(error.message, 'error');
+        } finally {
+            sidebarUserPic.style.opacity = '1';
+        }
+    }
+});
+
+// Close Edit Profile Modal
+editProfileModal.querySelector('.close-modal').addEventListener('click', () => {
+    editProfileModal.style.display = 'none';
+});
+
+window.addEventListener('click', (e) => {
+    if (e.target === editProfileModal) {
+        editProfileModal.style.display = 'none';
     }
 }); 

@@ -306,6 +306,50 @@ body {
 /* Tool Detail */
 .tool-detail {
     max-width: 800px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.tool-header {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--neon-purple);
+    background: var(--glass-bg);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.tool-preview {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+}
+
+.tool-title {
+    color: var(--neon-green);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.tool-info {
+    padding: 1rem 0;
+}
+
+.tool-description {
+    color: var(--text-color);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.tool-meta {
+    display: flex;
+    gap: 1rem;
+    color: #888;
+    font-size: 0.9rem;
 }
 
 .code-box {
@@ -314,6 +358,10 @@ body {
     padding: 1rem;
     border-radius: 5px;
     margin-top: 1rem;
+    max-height: 400px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--neon-purple) var(--glass-bg);
 }
 
 .code-lines {
@@ -330,7 +378,7 @@ body {
     background: rgba(0, 0, 0, 0.3);
     border-radius: 4px;
     border: 1px solid var(--neon-green);
-    word-break: break-all;
+    min-width: 0;
 }
 
 .code-line pre {
@@ -338,10 +386,30 @@ body {
     margin: 0;
     color: var(--neon-green);
     font-family: 'Share Tech Mono', monospace;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    font-size: 0.9rem;
-    line-height: 1.4;
+    white-space: pre;
+    overflow-x: auto;
+    padding-right: 0.5rem;
+    min-width: 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--neon-purple) var(--glass-bg);
+}
+
+.code-line pre::-webkit-scrollbar {
+    height: 6px;
+}
+
+.code-line pre::-webkit-scrollbar-track {
+    background: var(--glass-bg);
+    border-radius: 3px;
+}
+
+.code-line pre::-webkit-scrollbar-thumb {
+    background: var(--neon-purple);
+    border-radius: 3px;
+}
+
+.code-line pre::-webkit-scrollbar-thumb:hover {
+    background: var(--neon-pink);
 }
 
 .copy-btn {
@@ -389,6 +457,32 @@ body {
     .modal-content {
         margin: 20% auto;
         width: 95%;
+    }
+
+    .tool-detail {
+        max-height: 95vh;
+    }
+
+    .tool-preview {
+        height: 150px;
+    }
+
+    .code-box {
+        max-height: 300px;
+    }
+
+    .code-line {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .code-line pre {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .copy-btn {
+        align-self: flex-end;
     }
 }
 
@@ -493,103 +587,6 @@ body {
 
 .auth-switch a:hover {
     text-decoration: underline;
-}
-
-/* User Profile */
-.user-profile {
-    position: fixed;
-    top: 70px;
-    right: 1rem;
-    background: var(--glass-bg);
-    backdrop-filter: blur(10px);
-    padding: 1rem;
-    border-radius: 10px;
-    border: 1px solid var(--neon-purple);
-    z-index: 1000;
-}
-
-.profile-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.profile-header img {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    border: 2px solid var(--neon-green);
-}
-
-.profile-info h3 {
-    color: var(--neon-green);
-    margin: 0;
-    font-size: 1rem;
-}
-
-.profile-info p {
-    color: #888;
-    margin: 0;
-    font-size: 0.8rem;
-}
-
-.logout-btn {
-    width: 100%;
-    padding: 0.5rem;
-    background: var(--neon-pink);
-    border: none;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    transition: 0.3s;
-}
-
-.logout-btn:hover {
-    box-shadow: 0 0 10px var(--neon-pink);
-}
-
-/* Responsive adjustments */
-@media (max-width: 480px) {
-    .user-profile {
-        top: auto;
-        bottom: 1rem;
-        right: 1rem;
-        left: 1rem;
-    }
-}
-
-/* Sidebar User Profile */
-.sidebar-user-profile {
-    padding: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    border-bottom: 1px solid var(--neon-purple);
-    margin-bottom: 1rem;
-}
-
-.sidebar-user-profile img {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    border: 2px solid var(--neon-green);
-}
-
-.sidebar-user-info h3 {
-    color: var(--neon-green);
-    margin: 0;
-    font-size: 1rem;
-}
-
-.sidebar-user-info p {
-    color: #888;
-    margin: 0;
-    font-size: 0.8rem;
 }
 
 /* Login Prompt */
@@ -1148,4 +1145,125 @@ body.disclaimer-active .sidebar {
         width: 100%;
         justify-content: center;
     }
+}
+
+/* Sidebar User Profile */
+.sidebar-user-profile {
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: 1px solid var(--neon-purple);
+    margin-bottom: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.profile-pic-wrapper {
+    position: relative;
+    width: 60px;
+    height: 60px;
+}
+
+.profile-pic-wrapper img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid var(--neon-green);
+    object-fit: cover;
+}
+
+.edit-profile-pic {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: var(--neon-purple);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 0.8rem;
+}
+
+.edit-profile-pic:hover {
+    background: var(--neon-pink);
+    box-shadow: 0 0 10px var(--neon-pink);
+}
+
+.sidebar-user-info {
+    flex: 1;
+}
+
+.sidebar-user-info h3 {
+    color: var(--neon-green);
+    margin: 0;
+    font-size: 1rem;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.sidebar-user-info p {
+    color: #888;
+    margin: 0.2rem 0;
+    font-size: 0.8rem;
+}
+
+.edit-profile-btn {
+    background: transparent;
+    border: 1px solid var(--neon-purple);
+    color: var(--text-color);
+    padding: 0.3rem 0.6rem;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.5rem;
+    transition: 0.3s;
+}
+
+.edit-profile-btn:hover {
+    background: var(--neon-purple);
+    box-shadow: 0 0 10px var(--neon-purple);
+}
+
+.edit-profile-btn i {
+    font-size: 0.8rem;
+}
+
+/* Edit Profile Modal */
+#editProfileModal .modal-content {
+    max-width: 400px;
+}
+
+#editProfileModal .profile-pic-container {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 1.5rem;
+}
+
+#editProfileModal .profile-pic-container img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid var(--neon-green);
+    object-fit: cover;
+}
+
+#editProfileModal .upload-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+}
+
+#editProfileModal .form-group {
+    margin-bottom: 1rem;
+}
+
+#editProfileModal .auth-btn {
+    margin-top: 1rem;
 } 
