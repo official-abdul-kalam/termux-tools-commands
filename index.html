@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HackDeck - Termux Tools Manager</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="A comprehensive toolkit manager for Termux">
+    <meta name="theme-color" content="#39FF14">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="HackDeck">
+    
+    <!-- PWA Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192x192.png">
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Disclaimer Modal -->
+    <div class="modal disclaimer-modal" id="disclaimerModal">
+        <div class="modal-content disclaimer-content">
+            <div class="disclaimer-header">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h2>Warning</h2>
+            </div>
+            <div class="disclaimer-body">
+                <p><strong>⚠️ Use at Your Own Risk</strong></p>
+                <p>This application contains tools that should be used responsibly. By using this app, you agree to:</p>
+                <ul>
+                    <li>Use tools for educational purposes only</li>
+                    <li>Not engage in illegal activities</li>
+                    <li>Not harm systems without authorization</li>
+                    <li>Take responsibility for your actions</li>
+                </ul>
+                <p>The developers are not responsible for any misuse of these tools.</p>
+                <div class="agreement-checkbox">
+                    <input type="checkbox" id="agreeCheckbox">
+                    <label for="agreeCheckbox">I understand and agree to these terms</label>
+                </div>
+            </div>
+            <div class="disclaimer-footer">
+                <button id="agreeButton" class="agree-btn" disabled>I Agree</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="hamburger-menu">
+            <i class="fas fa-bars"></i>
+        </div>
+        <h1>Termux Tools & Commands</h1>
+    </nav>
+
+    <!-- Sidebar Menu -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>HackDeck</h2>
+            <button class="close-sidebar">&times;</button>
+        </div>
+        <!-- Add User Profile Section -->
+        <div class="sidebar-user-profile" id="sidebarUserProfile" style="display: none;">
+            <img id="sidebarUserPic" src="https://via.placeholder.com/50" alt="Profile Picture">
+            <div class="sidebar-user-info">
+                <h3 id="sidebarUserName">User Name</h3>
+                <p id="sidebarUserEmail">user@email.com</p>
+            </div>
+        </div>
+        <ul class="menu-items">
+            <li><a href="#" class="active"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="#" id="aboutBtn"><i class="fas fa-info-circle"></i> About</a></li>
+            <li><a href="#" id="privacyBtn"><i class="fas fa-shield-alt"></i> Privacy Policy</a></li>
+            <li><a href="#" id="loginBtn"><i class="fas fa-user-lock"></i> Login</a></li>
+            <li><a href="#" id="logoutBtnSidebar" style="display: none;"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Search Bar -->
+        <div class="search-container">
+            <input type="text" placeholder="Search tools..." class="search-bar">
+            <button class="search-btn"><i class="fas fa-search"></i></button>
+        </div>
+
+        <!-- Filter Tags -->
+        <div class="filter-tags">
+            <button class="tag active">ALL</button>
+            <button class="tag">WIFI</button>
+            <button class="tag">TERMUX</button>
+            <button class="tag">SOCIAL</button>
+            <button class="tag">ETHICAL</button>
+            <button class="tag">TOOLS</button>
+            <button class="tag">HACKING</button>
+            <button class="tag">TERMINAL</button>
+            <button class="tag">LINUX</button>
+            <button class="tag">WINDOWS</button>
+            <button class="tag">MACOS</button>
+            <button class="tag">ANDROID</button>
+            <button class="tag">IOS</button>
+        </div>
+
+        <!-- Tools Grid -->
+        <div class="tools-grid" id="toolsGrid">
+            <!-- Tool cards will be dynamically added here -->
+        </div>
+    </main>
+
+    <!-- Add Notification System -->
+    <div class="notification" id="notification">
+        <div class="notification-content">
+            <i class="fas fa-info-circle"></i>
+            <span id="notificationMessage"></span>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="auth-container">
+                <!-- Login Form -->
+                <form id="loginForm" class="auth-form">
+                    <h2>Login</h2>
+                    <div class="profile-pic-container">
+                        <img id="profilePic" src="https://via.placeholder.com/100" alt="Profile Picture">
+                        <label for="profilePicInput" class="upload-btn">
+                            <i class="fas fa-camera"></i>
+                        </label>
+                        <input type="file" id="profilePicInput" accept="image/*" style="display: none;">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="auth-btn">Login</button>
+                    <p class="auth-switch">Don't have an account? <a href="#" id="showSignup">Sign Up</a></p>
+                </form>
+
+                <!-- Signup Form -->
+                <form id="signupForm" class="auth-form" style="display: none;">
+                    <h2>Sign Up</h2>
+                    <div class="profile-pic-container">
+                        <img id="signupProfilePic" src="https://via.placeholder.com/100" alt="Profile Picture">
+                        <label for="signupProfilePicInput" class="upload-btn">
+                            <i class="fas fa-camera"></i>
+                        </label>
+                        <input type="file" id="signupProfilePicInput" accept="image/*" style="display: none;">
+                    </div>
+                    <div class="form-group">
+                        <label for="signupUsername">Username</label>
+                        <input type="text" id="signupUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupEmail">Email</label>
+                        <input type="email" id="signupEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input type="password" id="confirmPassword" required>
+                    </div>
+                    <button type="submit" class="auth-btn">Sign Up</button>
+                    <p class="auth-switch">Already have an account? <a href="#" id="showLogin">Login</a></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Profile Section (Hidden by default) -->
+    <div class="user-profile" id="userProfile" style="display: none;">
+        <div class="profile-header">
+            <img id="userProfilePic" src="https://via.placeholder.com/100" alt="Profile Picture">
+            <div class="profile-info">
+                <h3 id="userName">User Name</h3>
+                <p id="userEmail">user@email.com</p>
+            </div>
+        </div>
+        <button id="logoutBtn" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+    </div>
+
+    <!-- Tool Detail Modal -->
+    <div class="modal" id="toolDetailModal">
+        <div class="modal-content tool-detail">
+            <span class="close-modal">&times;</span>
+            <div class="tool-header">
+                <img src="" alt="Tool Preview" class="tool-preview">
+                <h2 class="tool-title"></h2>
+            </div>
+            <div class="tool-info">
+                <p class="tool-description"></p>
+                <div class="tool-meta">
+                    <span class="author"></span>
+                    <span class="date"></span>
+                </div>
+            </div>
+            <div class="code-box">
+                <div class="code-lines">
+                    <!-- Code lines will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Login Prompt Modal -->
+    <div class="modal" id="loginPromptModal">
+        <div class="modal-content login-prompt">
+            <span class="close-modal">&times;</span>
+            <h2>Login Required</h2>
+            <p>Please login or signup to copy commands.</p>
+            <div class="login-prompt-buttons">
+                <button id="goToLoginBtn" class="primary-btn">Login / Signup</button>
+                <button id="skipLoginBtn" class="secondary-btn">Skip for now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add About and Privacy Policy Modals -->
+    <div class="modal" id="aboutModal">
+        <div class="modal-content about-content">
+            <span class="close-modal">&times;</span>
+            <div class="about-header">
+                <i class="fas fa-info-circle"></i>
+                <h2>About HackDeck</h2>
+            </div>
+            <div class="about-body">
+                <div class="about-section">
+                    <h3>What is HackDeck?</h3>
+                    <p>HackDeck is a comprehensive toolkit manager for Termux, designed to help users access and manage various security and networking tools in one place. Our platform focuses on ethical hacking and cybersecurity education.</p>
+                </div>
+                
+                <div class="about-section">
+                    <h3>Our Mission</h3>
+                    <p>To provide a secure, user-friendly platform for learning and practicing cybersecurity tools while promoting ethical hacking practices and responsible usage.</p>
+                </div>
+
+                <div class="about-section">
+                    <h3>Features</h3>
+                    <ul>
+                        <li>Easy access to Termux tools</li>
+                        <li>One-click command copying</li>
+                        <li>Tool categorization and filtering</li>
+                        <li>User authentication system</li>
+                        <li>Regular tool updates</li>
+                    </ul>
+                </div>
+
+                <div class="about-section">
+                    <h3>Contact</h3>
+                    <p>For support or inquiries, please contact us at:</p>
+                    <p class="contact-info"><i class="fas fa-envelope"></i> support@hackdeck.com</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="privacyModal">
+        <div class="modal-content privacy-content">
+            <span class="close-modal">&times;</span>
+            <div class="privacy-header">
+                <i class="fas fa-shield-alt"></i>
+                <h2>Privacy Policy</h2>
+            </div>
+            <div class="privacy-body">
+                <div class="privacy-section">
+                    <h3>Information We Collect</h3>
+                    <ul>
+                        <li>Email address for account creation</li>
+                        <li>Profile information (username, profile picture)</li>
+                        <li>Usage statistics and preferences</li>
+                    </ul>
+                </div>
+
+                <div class="privacy-section">
+                    <h3>How We Use Your Information</h3>
+                    <ul>
+                        <li>To provide and maintain our service</li>
+                        <li>To notify you about changes to our service</li>
+                        <li>To provide customer support</li>
+                        <li>To monitor the usage of our service</li>
+                    </ul>
+                </div>
+
+                <div class="privacy-section">
+                    <h3>Data Security</h3>
+                    <p>We implement appropriate security measures to protect your personal information. Your data is encrypted and stored securely using industry-standard practices.</p>
+                </div>
+
+                <div class="privacy-section">
+                    <h3>Your Rights</h3>
+                    <ul>
+                        <li>Access your personal data</li>
+                        <li>Correct inaccurate data</li>
+                        <li>Request deletion of your data</li>
+                        <li>Opt-out of communications</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Install Prompt -->
+    <div class="install-prompt" id="installPrompt">
+        <div class="install-content">
+            <div class="install-icon">
+                <i class="fas fa-download"></i>
+            </div>
+            <div class="install-info">
+                <h3>Install HackDeck</h3>
+                <p>Install this app on your device for quick and easy access when you're on the go.</p>
+            </div>
+            <div class="install-buttons">
+                <button id="installButton" class="install-btn">
+                    <i class="fas fa-download"></i> Install
+                </button>
+                <button id="skipInstallButton" class="skip-btn">
+                    Skip for now
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Service Worker Registration -->
+    <script>
+        let deferredPrompt;
+        const installPrompt = document.getElementById('installPrompt');
+        const installButton = document.getElementById('installButton');
+        const skipInstallButton = document.getElementById('skipInstallButton');
+
+        // Check if already installed
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            installPrompt.style.display = 'none';
+        }
+
+        // Listen for the beforeinstallprompt event
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Show install prompt after a short delay
+            setTimeout(() => {
+                installPrompt.style.display = 'flex';
+            }, 2000);
+        });
+
+        // Handle install button click
+        installButton.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                }
+                deferredPrompt = null;
+                installPrompt.style.display = 'none';
+            }
+        });
+
+        // Handle skip button click
+        skipInstallButton.addEventListener('click', () => {
+            installPrompt.style.display = 'none';
+            // Store in localStorage to not show again in this session
+            localStorage.setItem('installPromptDismissed', 'true');
+        });
+
+        // Check if prompt was dismissed in this session
+        if (localStorage.getItem('installPromptDismissed')) {
+            installPrompt.style.display = 'none';
+        }
+
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
+
+    <!-- Add Firebase Scripts -->
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="script.js"></script>
+</body>
+</html> 
