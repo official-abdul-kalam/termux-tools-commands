@@ -59,7 +59,7 @@ const tools = [
         title: "WiFi Scanner",
         description: "Scan and analyze nearby WiFi networks",
         tags: ["WIFI", "NETWORK"],
-        preview: "https://via.placeholder.com/300x150",
+        preview: "https://picsum.photos/300/150",
         author: "Admin",
         date: "2024-03-20",
         code: `pkg install python
@@ -74,7 +74,7 @@ python scanner.py`,
         title: "Social Media Toolkit",
         description: "Collection of social media analysis tools",
         tags: ["SOCIAL", "ANALYSIS"],
-        preview: "https://via.placeholder.com/300x150",
+        preview: "https://picsum.photos/300/150",
         author: "Admin",
         date: "2024-03-19",
         code: `pkg install git
@@ -628,5 +628,55 @@ editProfileModal.querySelector('.close-modal').addEventListener('click', () => {
 window.addEventListener('click', (e) => {
     if (e.target === editProfileModal) {
         editProfileModal.style.display = 'none';
+    }
+});
+
+// Function to get random profile image
+function getRandomProfileImage() {
+    const profileImages = [
+        'assets/images/profile/profile1.jpg',
+        'assets/images/profile/profile2.jpg',
+        'assets/images/profile/profile3.jpg',
+        'assets/images/profile/profile4.jpg',
+        'assets/images/profile/profile5.jpg',
+        'assets/images/profile/profile6.jpg',
+        'assets/images/profile/profile7.jpg',
+        'assets/images/profile/profile8.jpg',
+        'assets/images/profile/profile9.jpg',
+        'assets/images/profile/profile10.jpg'
+    ];
+    return profileImages[Math.floor(Math.random() * profileImages.length)];
+}
+
+// Function to get random preview image
+function getRandomPreviewImage() {
+    const previewImages = [
+        'assets/images/preview/preview1.jpg',
+        'assets/images/preview/preview2.jpg',
+        'assets/images/preview/preview3.jpg',
+        'assets/images/preview/preview4.jpg',
+        'assets/images/preview/preview5.jpg'
+    ];
+    return previewImages[Math.floor(Math.random() * previewImages.length)];
+}
+
+// Update user profile when displaying
+const userProfile = document.querySelector('.sidebar-user-profile img');
+if (userProfile) {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (currentUser) {
+        currentUser.profileImage = currentUser.profileImage || getRandomProfileImage();
+        userProfile.src = currentUser.profileImage;
+    }
+}
+
+// Update tool previews
+const toolCards = document.querySelectorAll('.tool-card img');
+toolCards.forEach(card => {
+    const toolId = card.closest('.tool-card').dataset.id;
+    const tool = tools.find(t => t.id === toolId);
+    if (tool) {
+        tool.preview = tool.preview || getRandomPreviewImage();
+        card.src = tool.preview;
     }
 }); 
